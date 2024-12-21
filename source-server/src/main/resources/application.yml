@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: source-server
+
+service:
+  a:
+    name: service-a
+    domain: localhost
+    header:
+      key: ${service.a.name}-forwarded-port
+      ports: [ 8081, 8082 ]
+
+uris:
+  destination: /target/path

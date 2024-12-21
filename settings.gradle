@@ -1,1 +1,4 @@
 rootProject.name = 'forward'
+include 'source-server'
+include 'destination-a'
+include 'destination-b'
