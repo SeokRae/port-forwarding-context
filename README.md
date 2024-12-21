@@ -25,8 +25,8 @@
 다음과 같은 사용자 정의 헤더를 사용합니다:
 
 - `Forwarded-Port`: 초기 요청의 포트 정보 (기본 헤더)
-- `Destination-A-Forwarded-Port`: Destination A 서버로의 포워딩 시 사용될 포트
-- `Destination-B-Forwarded-Port`: Destination B 서버로의 포워딩 시 사용될 포트
+- `service-a-forwarded-port`: Destination A 서버로의 포워딩 시 사용될 포트
+- `service-b-forwarded-port`: Destination B 서버로의 포워딩 시 사용될 포트
 
 ## 주요 기능
 
@@ -51,15 +51,15 @@ Source Server → Destination A → Destination B 간 포워딩 시:
 ### 1. 단일 홉 포워딩
 ```bash
 # Destination A로 포워딩
-curl -H "Destination-A-Forwarded-Port: 9001" \
+curl -H "service-a-forwarded-port: 8081" \
      http://localhost:8080/port/forward
 ```
 
 ### 2. 다중 홉 포워딩
 ```bash
 # Destination A를 거쳐 B로 포워딩
-curl -H "Destination-A-Forwarded-Port: 9001" \
-     -H "Destination-B-Forwarded-Port: 9002" \
+curl -H "service-a-forwarded-port: 8081" \
+     -H "service-b-forwarded-port: 8082" \
      http://localhost:8080/port/forward
 ```
 
@@ -89,20 +89,33 @@ curl -H "Destination-A-Forwarded-Port: 9001" \
 
 ## 설정
 
-### application.yml
+### source-server/application.yml
 ```yaml
+
 service:
-  domain: localhost
-  ports:
-    a: 8081
-    b: 8082
+  a:
+    name: service-a
+    domain: localhost
+    header:
+      key: ${service.a.name}-forwarded-port
+      ports: [ 8081, 8082 ]
 
-uris:
-  destination: /target/path
-
-header:
-  forwarded-ports: [Destination-A-Forwarded-Port, Destination-B-Forwarded-Port, Destination-C-Forwarded-Port]
 ```
+
+### destination-a/application.yml
+
+```yaml
+
+service:
+  b:
+    name: service-b
+    domain: localhost
+    header:
+      key: ${service.b.name}-forwarded-port
+      ports: [ 8081, 8082 ]
+
+```
+
 
 ## 에러 처리
 - 잘못된 포트 번호 (400 Bad Request)
