@@ -55,25 +55,6 @@ Source Server → Destination A → Destination B 간 포워딩 시:
 - 요청별 독립적인 컨텍스트 유지
 - 요청 완료 시 자동 정리
 
-## API 사용 예시
-
-### 1. 단일 홉 포워딩
-
-```bash
-# Destination A로 포워딩
-curl -H "service-a-forwarded-port: 8081" \
-     http://localhost:8080/port/forward
-```
-
-### 2. 다중 홉 포워딩
-
-```bash
-# Destination A를 거쳐 B로 포워딩
-curl -H "service-a-forwarded-port: 8081" \
-     -H "service-b-forwarded-port: 8082" \
-     http://localhost:8080/port/forward
-```
-
 ## 기술 스택
 
 - Java 21
@@ -159,7 +140,26 @@ Destination B
 ./gradlew :destination-b:bootRun
 ```
 
-### 3. 실행 로그
+#### API 사용 예시
+
+##### 1. 단일 홉 포워딩
+
+```bash
+# Destination A로 포워딩
+curl -H "service-a-forwarded-port: 8081" \
+     http://localhost:8080/port/forward
+```
+
+##### 2. 다중 홉 포워딩
+
+```bash
+# Destination A를 거쳐 B로 포워딩
+curl -H "service-a-forwarded-port: 8081" \
+     -H "service-b-forwarded-port: 8082" \
+     http://localhost:8080/port/forward
+```
+
+#### 실행 로그
 
 - source-server
 
