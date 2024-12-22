@@ -1,6 +1,9 @@
 package org.example.source.core.filter;
 
-import jakarta.servlet.*;
+import jakarta.servlet.Filter;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -20,18 +23,21 @@ import java.util.stream.Collectors;
 public class ForwardedPortProcessingFilter implements Filter {
   private static final int MIN_PORT = 1;
   private static final int MAX_PORT = 65535;
+  //  알파벳 대소문자(a-z, A-Z), 숫자(0-9), 밑줄(_), 하이픈(-) 중 하나의 문자를 허용.
   private static final Pattern FORWARDED_PORT_HEADER_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+-forwarded-port$");
 
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-    throws IOException, ServletException {
+    throws IOException {
     HttpServletRequest httpRequest = (HttpServletRequest) request;
     HttpServletResponse httpResponse = (HttpServletResponse) response;
     ForwardedPortContext context = ForwardedPortContext.getContext();
     long startTime = System.currentTimeMillis();
 
     try {
+      // 요청 시작 로깅
       logRequestStart(httpRequest);
+      // 헤더 정보 저장 로직
       extractAndProcessPorts(httpRequest);
       chain.doFilter(request, response);
     } catch (Exception e) {
