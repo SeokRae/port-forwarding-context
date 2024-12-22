@@ -159,6 +159,74 @@ Destination B
 ./gradlew :destination-b:bootRun
 ```
 
+### 3. 실행 로그
+
+- source-server
+
+```text
+
+2024-12-22T18:14:58.159+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.f.ForwardedPortProcessingFilter  : Request Start - URI: /port/forward, Method: GET, Remote: 127.0.0.1, Headers: {service-a-forwarded-port=8081, service-b-forwarded-port=8082}
+2024-12-22T18:14:58.159+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.f.ForwardedPortProcessingFilter  : Port set - Header: service-a-forwarded-port, Port: 8081
+2024-12-22T18:14:58.159+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.f.ForwardedPortProcessingFilter  : Port set - Header: service-b-forwarded-port, Port: 8082
+2024-12-22T18:14:58.171+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.a.c.PortForwardController          : Forwarding request to service: service-a-forwarded-port, port: 8081
+2024-12-22T18:14:58.171+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.s.builder.UrlTemplateBuilder       : Building URI components for domain: localhost, path: /target/path, port: 8081
+2024-12-22T18:14:58.171+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.s.builder.UrlTemplateBuilder       : Using port: 8081
+2024-12-22T18:14:58.171+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.support.helper.RestTemplateHelper  : [Request] URI: http://localhost:8081/target/path, Method: GET, Headers: [service-b-forwarded-port:"8082"], Body: 
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : ================================================== Request Begin ==================================================
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : URI         : http://localhost:8081/target/path
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Method      : GET
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Headers     : [Accept:"text/plain, application/json, application/*+json, */*", service-b-forwarded-port:"8082", Content-Type:"text/plain;charset=UTF-8", Content-Length:"0"]
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Request body: 
+2024-12-22T18:14:58.179+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : ================================================== Request End ==================================================
+2024-12-22T18:14:58.304+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : ================================================== Response Begin ==================================================
+2024-12-22T18:14:58.305+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Status code  : 200 OK
+2024-12-22T18:14:58.306+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Status text  : 
+2024-12-22T18:14:58.306+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Headers      : [Date:"Sun, 22 Dec 2024 09:14:58 GMT", Keep-Alive:"timeout=60", Connection:"keep-alive, keep-alive", Content-Type:"text/plain;charset=UTF-8", Content-Length:"13"]
+2024-12-22T18:14:58.307+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Response body: Destination B
+2024-12-22T18:14:58.307+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : ================================================== Response End ==================================================
+2024-12-22T18:14:58.307+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.i.RestTemplateLoggingInterceptor : Processing time: 128 ms
+2024-12-22T18:14:58.309+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.support.helper.RestTemplateHelper  : [Response] Status: 200 OK, Body: Destination B
+2024-12-22T18:14:58.315+09:00  INFO 44482 --- [source-server] [    Test worker] o.e.s.c.f.ForwardedPortProcessingFilter  : Request End - Processing Time: 157 ms
+```
+
+- destination-a
+
+```text
+2024-12-22T18:14:58.221+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : ================================================== [Port PreHandle Start] ==================================================
+2024-12-22T18:14:58.221+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : Request URI    : /target/path
+2024-12-22T18:14:58.221+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : Request Method : GET
+2024-12-22T18:14:58.221+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : Remote Address : 127.0.0.1
+2024-12-22T18:14:58.222+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : Port configuration completed - Header: service-b-forwarded-port, Port: 8082
+2024-12-22T18:14:58.222+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : ================================================== [Port PreHandle End] ==================================================
+2024-12-22T18:14:58.232+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.a.DestinationAController           : Forwarding request to service: service-b-forwarded-port, port: 8082
+2024-12-22T18:14:58.232+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.s.builder.UrlTemplateBuilder       : Building URI components for domain: localhost, path: /target/path, port: 8082
+2024-12-22T18:14:58.234+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.s.builder.UrlTemplateBuilder       : Using port: 8082
+2024-12-22T18:14:58.234+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.support.helper.RestTemplateHelper  : [Request] URI: http://localhost:8082/target/path, Method: GET, Headers: [], Body: 
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : ================================================== Request Begin ==================================================
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : URI         : http://localhost:8082/target/path
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Method      : GET
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Headers     : [Accept:"text/plain, application/json, application/*+json, */*", Content-Type:"text/plain;charset=UTF-8", Content-Length:"0"]
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Request body: 
+2024-12-22T18:14:58.241+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : ================================================== Request End ==================================================
+2024-12-22T18:14:58.296+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : ================================================== Response Begin ==================================================
+2024-12-22T18:14:58.296+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Status code  : 200 OK
+2024-12-22T18:14:58.296+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Status text  : 
+2024-12-22T18:14:58.296+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Headers      : [Content-Type:"text/plain;charset=UTF-8", Content-Length:"13", Date:"Sun, 22 Dec 2024 09:14:58 GMT", Keep-Alive:"timeout=60", Connection:"keep-alive"]
+2024-12-22T18:14:58.297+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Response body: Destination B
+2024-12-22T18:14:58.297+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : ================================================== Response End ==================================================
+2024-12-22T18:14:58.297+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.c.i.RestTemplateLoggingInterceptor : Processing time: 56 ms
+2024-12-22T18:14:58.299+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.support.helper.RestTemplateHelper  : [Response] Status: 200 OK, Body: Destination B
+2024-12-22T18:14:58.304+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : ================================================== [Port PostHandle End] ==================================================
+2024-12-22T18:14:58.304+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : [Port Processing End] Processing Time: 83 ms
+2024-12-22T18:14:58.304+09:00  INFO 44460 --- [service-a] [nio-8081-exec-1] o.e.d.core.filter.PortProcessingFilter   : ================================================== [Port PostHandle End] ==================================================
+```
+
+- destination-b
+
+```text
+2024-12-22T18:14:58.285+09:00  INFO 44471 --- [service-b] [nio-8082-exec-1] o.e.d.a.DestinationBController           : Destination B
+```
+
 ## 설정
 
 ### source-server/application.yml
