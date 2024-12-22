@@ -6,8 +6,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -33,10 +33,11 @@ class PortForwardControllerTest {
   }
 
   @Test
-  void testInvalidPortForwarding() {
+  void testInvalidPortForwarding() throws Exception {
     // Invalid port number
-    assertThrows(Exception.class, () -> mockMvc.perform(get("/port/forward")
-        .header("service-a-forwarded-port", "A"))
-      .andExpect(status().isBadRequest()));
+    mockMvc.perform(get("/port/forward"))
+      .andExpect(status().isBadRequest())
+      .andExpect(content().string("Invalid or missing port information."));
+
   }
 }
