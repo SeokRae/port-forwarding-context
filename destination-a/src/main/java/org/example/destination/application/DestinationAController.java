@@ -1,8 +1,5 @@
 package org.example.destination.application;
 
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -16,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
 import java.util.HashMap;
 
 @Slf4j
@@ -29,27 +25,32 @@ public class DestinationAController {
   private final UrisProperties urisProperties;
 
   @GetMapping("/target/path/a")
-  public void destinationA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+  public ResponseEntity<String> destinationA() {
     ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getB().getHeader().getKey();
     Integer headerValue = context.getAttribute(headerKey, Integer.class).orElse(null);
 
-    if (headerValue != null) {
-      log.info("Header found: {} -> Forwarding to /internal/forward/b", headerKey);
-      log.info("Initiating forward to service: {}, port: {}", headerKey, headerValue);
-
-      request.getRequestDispatcher("/internal/forward/b").forward(request, response);
-
-      log.info("Forwarding to /internal/forward/b completed successfully.");
-    } else {
-      log.info("Header not found: {} -> Responding with 'Destination A'", headerKey);
-      response.getWriter().write("Destination A");
+    try {
+      log.info("================================================== A Service Begin ==================================================");
+      if (headerValue != null) {
+        log.info("Header found: {} -> Delegating to destination B", headerKey);
+        log.info("Initiating request to service: {}, port: {}", headerKey, headerValue);
+        return destinationB();
+      } else {
+        log.info("Header not found: {} -> Responding with 'Destination A'", headerKey);
+        return ResponseEntity.ok("Destination A");
+      }
+    } catch (RuntimeException e) {
+      log.error("Error occurred while processing the request.", e);
+      return ResponseEntity.internalServerError()
+        .body("Error occurred while processing the request.");
+    } finally {
+      log.info("================================================== A Service End ==================================================");
     }
   }
 
-
-  @GetMapping("/internal/forward/b")
-  public ResponseEntity<String> destinationB() {
+  private ResponseEntity<String> destinationB() {
+    log.info("================================================== B Service Call ==================================================");
     ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getB().getHeader().getKey();
 
@@ -62,17 +63,24 @@ public class DestinationAController {
 
     HttpHeaders headers = createHeaders(context, headerKey);
     log.info("Forwarding request to service: {}, port: {}", headerKey, port);
+    try {
 
-    return restTemplateHelper.postRequest(
-      serviceProperties.getB().getDomain(),
-      urisProperties.getDestination(),
-      port,
-      headers,
-      HttpMethod.GET,
-      new HashMap<>(),
-      Strings.EMPTY,
-      String.class
-    );
+      return restTemplateHelper.postRequest(
+        serviceProperties.getB().getDomain(),
+        urisProperties.getDestination(),
+        port,
+        headers,
+        HttpMethod.GET,
+        new HashMap<>(),
+        Strings.EMPTY,
+        String.class
+      );
+    } catch (Exception e) {
+      log.error("Error occurred while processing the request.", e);
+      return ResponseEntity.badRequest().body("Error occurred while processing the request.");
+    } finally {
+      log.info("================================================== B Service End ==================================================");
+    }
   }
 
   private HttpHeaders createHeaders(ForwardedPortContext context, String excludeKey) {

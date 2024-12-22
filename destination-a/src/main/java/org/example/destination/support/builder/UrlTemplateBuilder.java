@@ -21,7 +21,6 @@ public class UrlTemplateBuilder {
       .path(path);
 
     if (port != null) {
-      log.info("Using port: {}", port);
       uriBuilder.port(port);
     }
 
