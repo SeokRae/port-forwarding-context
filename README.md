@@ -97,7 +97,7 @@ service-b-forwarded-port: 8082
 HTTP/1.1 200 OK
 Content-Type: text/plain;charset=UTF-8
 
-Destination B
+"Destination B"
 ```
 
 ### destination-b
@@ -115,10 +115,9 @@ Host: localhost:8082
 HTTP/1.1 200 OK
 Content-Type: text/plain;charset=UTF-8
 
-Destination B
-
+"Destination B"
 ```
-`
+
 ## 실행 방법
 
 ### 1. 프로젝트 빌드
