@@ -2,6 +2,7 @@ package org.example.source.application.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.example.source.core.props.ServiceProperties;
 import org.example.source.core.props.UrisProperties;
 import org.example.source.support.context.RequestContext;
@@ -32,6 +33,7 @@ public class PortForwardController {
    */
   @GetMapping("/forward")
   public ResponseEntity<String> forward() {
+    // 서버 내 설정 정보 기반 Context에서 Lookup 하여 처리
     String headerKey = serviceProperties.getA().getHeader().getKey();
     RequestContext context = RequestContext.getContext();
 
@@ -50,7 +52,7 @@ public class PortForwardController {
       headers,
       HttpMethod.GET,
       new HashMap<>(),
-      "",
+      Strings.EMPTY,
       String.class
     );
   }
@@ -58,14 +60,14 @@ public class PortForwardController {
   /**
    * RequestContext의 속성들을 HttpHeaders로 변환하되, 지정된 키는 제외합니다.
    *
-   * @param context 요청 컨텍스트
+   * @param context    요청 컨텍스트
    * @param excludeKey 제외할 헤더 키
    * @return 변환된 HttpHeaders
    */
   private HttpHeaders createHeadersExcluding(RequestContext context, String excludeKey) {
     HttpHeaders headers = new HttpHeaders();
     context.getAttributesExcluding(excludeKey)
-      .forEach((headerName, headerValue) -> 
+      .forEach((headerName, headerValue) ->
         headers.add(headerName, String.valueOf(headerValue))
       );
     return headers;

@@ -1,10 +1,10 @@
-package org.example.source.core.filter;
+package org.example.destination.core.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.source.support.context.RequestContext;
+import org.example.destination.support.context.RequestContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
