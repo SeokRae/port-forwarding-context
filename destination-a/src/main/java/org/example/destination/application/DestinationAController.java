@@ -14,7 +14,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.util.HashMap;
 
 @Slf4j
 @RestController
-@RequestMapping("/target/path")
 @RequiredArgsConstructor
 public class DestinationAController {
 
@@ -30,22 +28,27 @@ public class DestinationAController {
   private final ServiceProperties serviceProperties;
   private final UrisProperties urisProperties;
 
-  @GetMapping("/a")
+  @GetMapping("/target/path/a")
   public void destinationA(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getB().getHeader().getKey();
     Integer headerValue = context.getAttribute(headerKey, Integer.class).orElse(null);
 
     if (headerValue != null) {
-      log.info("Header found: {} -> Forwarding to /b", headerKey);
-      request.getRequestDispatcher("/target/path/b").forward(request, response);
+      log.info("Header found: {} -> Forwarding to /internal/forward/b", headerKey);
+      log.info("Initiating forward to service: {}, port: {}", headerKey, headerValue);
+
+      request.getRequestDispatcher("/internal/forward/b").forward(request, response);
+
+      log.info("Forwarding to /internal/forward/b completed successfully.");
     } else {
       log.info("Header not found: {} -> Responding with 'Destination A'", headerKey);
       response.getWriter().write("Destination A");
     }
   }
 
-  @GetMapping("/b")
+
+  @GetMapping("/internal/forward/b")
   public ResponseEntity<String> destinationB() {
     ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getB().getHeader().getKey();
