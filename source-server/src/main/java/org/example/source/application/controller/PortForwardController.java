@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.example.source.core.props.ServiceProperties;
 import org.example.source.core.props.UrisProperties;
-import org.example.source.support.context.RequestContext;
+import org.example.source.support.context.ForwardedPortContext;
 import org.example.source.support.helper.RestTemplateHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -33,16 +33,17 @@ public class PortForwardController {
    */
   @GetMapping("/forward")
   public ResponseEntity<String> forward() {
-    // 서버 내 설정 정보 기반 Context에서 Lookup 하여 처리
+    ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getA().getHeader().getKey();
-    RequestContext context = RequestContext.getContext();
 
-    Integer port = context
-      .getAttribute(headerKey, Integer.class)
-      .orElse(null);
+    Integer port = context.getAttribute(headerKey, Integer.class).orElse(null);
 
-    HttpHeaders headers = createHeadersExcluding(context, headerKey);
+    if (port == null) {
+      log.error("Port information is missing in the context. Header Key: {}", headerKey);
+      return ResponseEntity.badRequest().body("Invalid or missing port information.");
+    }
 
+    HttpHeaders headers = createHeaders(context, headerKey);
     log.info("Forwarding request to service: {}, port: {}", headerKey, port);
 
     return restTemplateHelper.postRequest(
@@ -58,18 +59,19 @@ public class PortForwardController {
   }
 
   /**
-   * RequestContext의 속성들을 HttpHeaders로 변환하되, 지정된 키는 제외합니다.
+   * Create HTTP headers excluding the specified key.
    *
-   * @param context    요청 컨텍스트
-   * @param excludeKey 제외할 헤더 키
-   * @return 변환된 HttpHeaders
+   * @param context    The request context containing header attributes
+   * @param excludeKey The key to exclude from the headers
+   * @return HttpHeaders containing all relevant attributes
    */
-  private HttpHeaders createHeadersExcluding(RequestContext context, String excludeKey) {
+  private HttpHeaders createHeaders(ForwardedPortContext context, String excludeKey) {
     HttpHeaders headers = new HttpHeaders();
-    context.getAttributesExcluding(excludeKey)
-      .forEach((headerName, headerValue) ->
-        headers.add(headerName, String.valueOf(headerValue))
-      );
+    context.getAttributes()
+      .entrySet()
+      .stream()
+      .filter(entry -> !entry.getKey().equals(excludeKey))
+      .forEach(entry -> headers.add(entry.getKey(), String.valueOf(entry.getValue())));
     return headers;
   }
 }

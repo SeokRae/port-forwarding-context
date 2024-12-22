@@ -28,7 +28,7 @@ public class PortProcessingFilter implements Filter {
 
     try {
       preHandle(httpRequest);
-      processHandle(httpRequest, request, response, chain);
+      processHandle(request, response, chain);
     } catch (Exception e) {
       log.error("Error occurred during port processing: {}", e.getMessage());
       throw e;
@@ -47,8 +47,7 @@ public class PortProcessingFilter implements Filter {
   }
 
   // 메인 처리: 실제 필터 체인 실행
-  private void processHandle(HttpServletRequest httpRequest,
-                             ServletRequest request,
+  private void processHandle(ServletRequest request,
                              ServletResponse response,
                              FilterChain chain) throws IOException, ServletException {
     chain.doFilter(request, response);

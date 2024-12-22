@@ -9,11 +9,11 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("NonAsciiCharacters")
-class RequestContextTest {
+class ForwardedPortContextTest {
 
   @AfterEach
   void cleanup() {
-    RequestContext.getContext().clear();
+    ForwardedPortContext.getContext().clear();
   }
 
   private static Stream<TestCase> portTestCases() {
@@ -76,7 +76,7 @@ class RequestContextTest {
   @MethodSource("portTestCases")
   void 포트_키_저장_테스트(TestCase testCase) {
     // given
-    RequestContext context = RequestContext.getContext();
+    ForwardedPortContext context = ForwardedPortContext.getContext();
 
     // when
     context.setAttribute(testCase.key, testCase.port);
@@ -101,16 +101,16 @@ class RequestContextTest {
   @MethodSource("threadTestCases")
   void 스레드별로_독립적인_컨텍스트를_가진다(ThreadTestCase testCase) throws InterruptedException {
     // given
-    RequestContext context1 = RequestContext.getContext();
+    ForwardedPortContext context1 = ForwardedPortContext.getContext();
     context1.setAttribute(testCase.key, testCase.mainPort);
 
     // when
     Thread thread = new Thread(() -> {
-      RequestContext context2 = RequestContext.getContext();
+      ForwardedPortContext context2 = ForwardedPortContext.getContext();
       context2.setAttribute(testCase.key, testCase.threadPort);
 
       // then
-      RequestContext.getContext()
+      ForwardedPortContext.getContext()
         .getAttribute(testCase.key, Integer.class)
         .ifPresent(port -> assertThat(port).isEqualTo(testCase.threadPort));
     });
@@ -119,7 +119,7 @@ class RequestContextTest {
     thread.join();
 
     // then
-    RequestContext.getContext()
+    ForwardedPortContext.getContext()
       .getAttribute(testCase.key, Integer.class)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.mainPort));
   }
@@ -128,7 +128,7 @@ class RequestContextTest {
   @MethodSource("contextTestCases")
   void clear_호출시_컨텍스트가_초기화된다(ContextTestCase testCase) {
     // given
-    RequestContext context = RequestContext.getContext();
+    ForwardedPortContext context = ForwardedPortContext.getContext();
     context.setAttribute(testCase.key, testCase.port);
 
     // when
@@ -143,11 +143,11 @@ class RequestContextTest {
   @MethodSource("contextTestCases")
   void getCurrentContext로_현재_스레드의_컨텍스트를_가져온다(ContextTestCase testCase) {
     // given
-    RequestContext context = RequestContext.getContext();
+    ForwardedPortContext context = ForwardedPortContext.getContext();
     context.setAttribute(testCase.key, testCase.port);
 
     // when
-    RequestContext currentContext = RequestContext.getContext();
+    ForwardedPortContext currentContext = ForwardedPortContext.getContext();
 
     // then
     context.getAttribute(testCase.key, Integer.class)

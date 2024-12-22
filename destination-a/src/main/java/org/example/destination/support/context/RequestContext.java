@@ -47,7 +47,7 @@ public class RequestContext {
     return Collections.unmodifiableMap(contextData);
   }
 
-  // 특정 키의 데이터 삭제
+  // 특정 키의 데이터 삭제 (요청 Scope의 헤더 정보를 삭제 해야 할 필요가 있을까?)
   public void removeAttribute(String key) {
     contextData.remove(key);
   }
