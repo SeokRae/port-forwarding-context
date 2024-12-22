@@ -58,13 +58,6 @@ public class PortForwardController {
     );
   }
 
-  /**
-   * Create HTTP headers excluding the specified key.
-   *
-   * @param context    The request context containing header attributes
-   * @param excludeKey The key to exclude from the headers
-   * @return HttpHeaders containing all relevant attributes
-   */
   private HttpHeaders createHeaders(ForwardedPortContext context, String excludeKey) {
     HttpHeaders headers = new HttpHeaders();
     context.getAttributes()

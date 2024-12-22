@@ -2,7 +2,7 @@ package org.example.destination.core.config;
 
 
 import jakarta.servlet.DispatcherType;
-import org.example.destination.core.filter.PortProcessingFilter;
+import org.example.destination.core.filter.ForwardedPortProcessingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +12,10 @@ import org.springframework.core.Ordered;
 public class ServletFilterConfiguration {
 
   @Bean
-  public FilterRegistrationBean<PortProcessingFilter> portProcessingFilterRegistration(PortProcessingFilter portProcessingFilter) {
-    FilterRegistrationBean<PortProcessingFilter> registrationBean = new FilterRegistrationBean<>();
+  public FilterRegistrationBean<ForwardedPortProcessingFilter> portProcessingFilterRegistration(ForwardedPortProcessingFilter forwardedPortProcessingFilter) {
+    FilterRegistrationBean<ForwardedPortProcessingFilter> registrationBean = new FilterRegistrationBean<>();
 
-    registrationBean.setFilter(portProcessingFilter);
+    registrationBean.setFilter(forwardedPortProcessingFilter);
     registrationBean.addUrlPatterns("/*");
     registrationBean.setOrder(Ordered.HIGHEST_PRECEDENCE);
     registrationBean.setDispatcherTypes(DispatcherType.REQUEST);

@@ -11,4 +11,4 @@ service:
       ports: [ 8081, 8082 ]
 
 uris:
-  destination: /target/path
+  destination: /target/path/a

@@ -21,7 +21,8 @@ class PortForwardControllerTest {
   void testSinglePortForwarding() throws Exception {
     mockMvc.perform(get("/port/forward")
         .header("service-a-forwarded-port", 8081))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andExpect(content().string("Destination A"));
   }
 
   @Test
@@ -29,7 +30,8 @@ class PortForwardControllerTest {
     mockMvc.perform(get("/port/forward")
         .header("service-a-forwarded-port", 8081)
         .header("service-b-forwarded-port", 8082))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andExpect(content().string("Destination B"));
   }
 
   @Test
