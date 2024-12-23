@@ -33,24 +33,21 @@ public class PortForwardController {
    */
   @GetMapping("/forward")
   public ResponseEntity<String> forward() {
-    ForwardedPortContext context = ForwardedPortContext.getContext();
-    String headerKey = serviceProperties.getA().getHeader().getKey();
 
-    Integer port = context.getAttribute(headerKey).orElse(null);
+    String headerKey = serviceProperties.getA().getHeader().getKey();
+    Integer port = ForwardedPortContext.getAttribute(headerKey).orElse(null);
 
     if (port == null) {
       log.error("Port information is missing in the context. Header Key: {}", headerKey);
       return ResponseEntity.badRequest().body("Invalid or missing port information.");
     }
 
-    HttpHeaders headers = createHeaders(context, headerKey);
     log.info("Forwarding request to service: {}, port: {}", headerKey, port);
 
     return restTemplateHelper.postRequest(
       serviceProperties.getA().getDomain(),
       urisProperties.getDestination(),
-      port,
-      headers,
+      HttpHeaders.EMPTY,
       HttpMethod.GET,
       new HashMap<>(),
       Strings.EMPTY,

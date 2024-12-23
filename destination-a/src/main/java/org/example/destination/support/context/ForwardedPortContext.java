@@ -17,10 +17,18 @@ public class ForwardedPortContext {
   private static final ThreadLocal<ContextHolder> CONTEXT = ThreadLocal.withInitial(ContextHolder::new);
 
   public static void setAttribute(String key, int port) {
+    if (key == null) {
+      log.warn("Attempted to set attribute with null key");
+      return;
+    }
     CONTEXT.get().setAttribute(key, port);
   }
 
   public static Optional<Integer> getAttribute(String key) {
+    if (key == null) {
+      log.warn("Attempted to get attribute with null key");
+      return Optional.empty();
+    }
     return CONTEXT.get().getAttribute(key);
   }
 
@@ -29,6 +37,10 @@ public class ForwardedPortContext {
   }
 
   public static void removeAttribute(String key) {
+    if (key == null) {
+      log.warn("Attempted to remove attribute with null key");
+      return;
+    }
     CONTEXT.get().removeAttribute(key);
   }
 

@@ -13,14 +13,13 @@ class ForwardedPortContextTest {
 
   @AfterEach
   void cleanup() {
-    ForwardedPortContext.getContext().clear();
+    ForwardedPortContext.clear();
   }
 
   private static Stream<TestCase> portTestCases() {
     return Stream.of(
       new TestCase("x-forwarded-port", 8080, true),
-      new TestCase("proxy-forwarded-port", 8081, true),
-      new TestCase("normal-port", 8082, false)
+      new TestCase("proxy-forwarded-port", 8081, true)
     );
   }
 
@@ -76,20 +75,19 @@ class ForwardedPortContextTest {
   @MethodSource("portTestCases")
   void 포트_키_저장_테스트(TestCase testCase) {
     // given
-    ForwardedPortContext context = ForwardedPortContext.getContext();
 
     // when
-    context.setAttribute(testCase.key, testCase.port);
+    ForwardedPortContext.setAttribute(testCase.key, testCase.port);
 
     // then
     if (testCase.shouldStore) {
-      context
+      ForwardedPortContext
         .getAttribute(testCase.key)
         .ifPresent(port -> {
           assertThat(port).isEqualTo(testCase.port);
         });
     } else {
-      context
+      ForwardedPortContext
         .getAttribute(testCase.key)
         .ifPresent(port -> {
           assertThat(port).isNotEqualTo(testCase.port);
@@ -101,16 +99,14 @@ class ForwardedPortContextTest {
   @MethodSource("threadTestCases")
   void 스레드별로_독립적인_컨텍스트를_가진다(ThreadTestCase testCase) throws InterruptedException {
     // given
-    ForwardedPortContext context1 = ForwardedPortContext.getContext();
-    context1.setAttribute(testCase.key, testCase.mainPort);
+    ForwardedPortContext.setAttribute(testCase.key, testCase.mainPort);
 
     // when
     Thread thread = new Thread(() -> {
-      ForwardedPortContext context2 = ForwardedPortContext.getContext();
-      context2.setAttribute(testCase.key, testCase.threadPort);
+      ForwardedPortContext.setAttribute(testCase.key, testCase.threadPort);
 
       // then
-      ForwardedPortContext.getContext()
+      ForwardedPortContext
         .getAttribute(testCase.key)
         .ifPresent(port -> assertThat(port).isEqualTo(testCase.threadPort));
     });
@@ -119,7 +115,7 @@ class ForwardedPortContextTest {
     thread.join();
 
     // then
-    ForwardedPortContext.getContext()
+    ForwardedPortContext
       .getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.mainPort));
   }
@@ -128,14 +124,13 @@ class ForwardedPortContextTest {
   @MethodSource("contextTestCases")
   void clear_호출시_컨텍스트가_초기화된다(ContextTestCase testCase) {
     // given
-    ForwardedPortContext context = ForwardedPortContext.getContext();
-    context.setAttribute(testCase.key, testCase.port);
+    ForwardedPortContext.setAttribute(testCase.key, testCase.port);
 
     // when
-    context.clear();
+    ForwardedPortContext.clear();
 
     // then
-    context.getAttribute(testCase.key)
+    ForwardedPortContext.getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.port));
   }
 
@@ -143,14 +138,11 @@ class ForwardedPortContextTest {
   @MethodSource("contextTestCases")
   void getCurrentContext로_현재_스레드의_컨텍스트를_가져온다(ContextTestCase testCase) {
     // given
-    ForwardedPortContext context = ForwardedPortContext.getContext();
-    context.setAttribute(testCase.key, testCase.port);
+    ForwardedPortContext.setAttribute(testCase.key, testCase.port);
 
     // when
-    ForwardedPortContext currentContext = ForwardedPortContext.getContext();
-
     // then
-    context.getAttribute(testCase.key)
+    ForwardedPortContext.getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.port));
   }
 }

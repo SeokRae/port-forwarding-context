@@ -1,114 +1,131 @@
 package org.example.source.support.context;
 
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DisplayName("포트 처리 예외 테스트")
 class ForwardedPortContextExceptionTest {
-  private ForwardedPortContext context;
 
-  @BeforeEach
-  void setUp() {
-    context = ForwardedPortContext.getContext();
-  }
+    @AfterEach
+    void tearDown() {
+        ForwardedPortContext.clear();
+    }
 
-  @AfterEach
-  void tearDown() {
-    context.clear();
-  }
+    private static Stream<InvalidPortTestCase> invalidPortTestCases() {
+        return Stream.of(
+            new InvalidPortTestCase("service-a-forwarded-port", "abc", "숫자가 아닌 포트값"),
+            new InvalidPortTestCase("service-a-forwarded-port", "12.34", "소수점이 있는 포트값"),
+            new InvalidPortTestCase("service-a-forwarded-port", "", "빈 포트값"),
+            new InvalidPortTestCase("service-a-forwarded-port", "포트", "한글 포트값"),
+            new InvalidPortTestCase("service-a-forwarded-port", "!@#$", "특수문자 포트값")
+        );
+    }
 
-  @Test
-  @DisplayName("포트 값이 숫자가 아닌 경우 처리되지 않아야 한다")
-  void whenPortValueIsNotNumeric_thenShouldNotProcess() {
-    // given
-    String headerKey = "service-a-forwarded-port";
-    String invalidPort = "abc";
+    private static Stream<OutOfRangePortTestCase> outOfRangePortTestCases() {
+        return Stream.of(
+            new OutOfRangePortTestCase("service-a-forwarded-port", -1, "음수 포트"),
+            new OutOfRangePortTestCase("service-a-forwarded-port", 0, "0번 포트"),
+            new OutOfRangePortTestCase("service-a-forwarded-port", 65536, "최대값 초과 포트"),
+            new OutOfRangePortTestCase("service-a-forwarded-port", 99999, "큰 범위 초과 포트")
+        );
+    }
 
-    // when
-    context.extractAndProcessForwardedPorts(Map.of(headerKey, invalidPort));
+    private static Stream<InvalidKeyTestCase> invalidKeyTestCases() {
+        return Stream.of(
+            new InvalidKeyTestCase(null, 8080, "null 키"),
+            new InvalidKeyTestCase("", 8080, "빈 문자열 키"),
+            new InvalidKeyTestCase("   ", 8080, "공백 문자열 키"),
+            new InvalidKeyTestCase("invalid-key", 8080, "잘못된 형식의 키"),
+            new InvalidKeyTestCase("service-wrong-suffix", 8080, "잘못된 접미사의 키")
+        );
+    }
 
-    // then
-    assertThat(context.getAttribute(headerKey)).isEmpty();
-  }
+    @ParameterizedTest(name = "{2}")
+    @MethodSource("invalidPortTestCases")
+    @DisplayName("유효하지 않은 포트값 테스트")
+    void whenInvalidPortValue_thenShouldNotProcess(InvalidPortTestCase testCase) {
+        // when
+        try {
+            ForwardedPortContext.setAttribute(testCase.key, Integer.parseInt(testCase.port));
+        } catch (NumberFormatException ignored) {
+            // 예외 발생 예상됨
+        }
 
-  @Test
-  @DisplayName("포트 범위를 벗어난 경우 처리되지 않아야 한다")
-  void whenPortValueIsOutOfRange_thenShouldNotProcess() {
-    // given
-    String headerKey = "service-a-forwarded-port";
-    String[] invalidPorts = {"0", "65536", "-1", "999999"};
+        // then
+        assertThat(ForwardedPortContext.getAttribute(testCase.key))
+            .as("%s '%s'가 처리되지 않아야 함", testCase.description, testCase.port)
+            .isEmpty();
+    }
 
-    // when & then
-    Arrays.stream(invalidPorts).forEach(port -> {
-      context.extractAndProcessForwardedPorts(Map.of(headerKey, port));
-      assertThat(context.getAttribute(headerKey))
-        .as("Port %s should not be processed", port)
-        .isEmpty();
-    });
-  }
+    @ParameterizedTest(name = "{2}")
+    @MethodSource("outOfRangePortTestCases")
+    @DisplayName("범위를 벗어난 포트값 테스트")
+    void whenPortValueOutOfRange_thenShouldNotProcess(OutOfRangePortTestCase testCase) {
+        // when
+        ForwardedPortContext.setAttribute(testCase.key, testCase.port);
 
-  @Test
-  @DisplayName("헤더 키가 올바르지 않은 경우 처리되지 않아야 한다")
-  void whenHeaderKeyIsInvalid_thenShouldNotProcess() {
-    // given
-    Map<String, String> invalidHeaders = Map.of(
-      "invalid-header", "8080",
-      "service-a-wrong-suffix", "8080",
-      "!invalid-forwarded-port", "8080"
-    );
+        // then
+        assertThat(ForwardedPortContext.getAttribute(testCase.key))
+            .as("%s %d가 처리되지 않아야 함", testCase.description, testCase.port)
+            .isEmpty();
+    }
 
-    // when
-    context.extractAndProcessForwardedPorts(invalidHeaders);
+    @ParameterizedTest(name = "{2}")
+    @MethodSource("invalidKeyTestCases")
+    @DisplayName("유효하지 않은 키 테스트")
+    void whenInvalidKey_thenShouldNotProcess(InvalidKeyTestCase testCase) {
+        // when
+        try {
+            ForwardedPortContext.setAttribute(testCase.key, testCase.port);
+        } catch (Exception ignored) {
+            // null 키의 경우 예외 발생 가능
+        }
 
-    // then
-    assertThat(context.getAttributes()).isEmpty();
-  }
+        // then
+        assertThat(ForwardedPortContext.getAttribute(testCase.key))
+            .as("%s가 처리되지 않아야 함", testCase.description)
+            .isEmpty();
+    }
 
-  @Test
-  @DisplayName("null 또는 빈 값이 입력된 경우 처리되지 않아야 한다")
-  void whenNullOrEmptyValues_thenShouldNotProcess() {
-    // given
-    String validKey = "service-a-forwarded-port";
+    private static class InvalidPortTestCase {
+        String key;
+        String port;
+        String description;
 
-    // when & then
-    HashMap<String, String> headers = new HashMap<>();
-    headers.put(validKey, null);
-    context.extractAndProcessForwardedPorts(headers);
-    assertThat(context.getAttribute(validKey)).isEmpty();
+        InvalidPortTestCase(String key, String port, String description) {
+            this.key = key;
+            this.port = port;
+            this.description = description;
+        }
+    }
 
-    context.extractAndProcessForwardedPorts(Map.of(validKey, ""));
-    assertThat(context.getAttribute(validKey)).isEmpty();
+    private static class OutOfRangePortTestCase {
+        String key;
+        int port;
+        String description;
 
-    context.extractAndProcessForwardedPorts(Map.of(validKey, "  "));
-    assertThat(context.getAttribute(validKey)).isEmpty();
-  }
+        OutOfRangePortTestCase(String key, int port, String description) {
+            this.key = key;
+            this.port = port;
+            this.description = description;
+        }
+    }
 
-  @Test
-  @DisplayName("여러 예외 케이스가 혼합된 경우 유효한 포트만 처리되어야 한다")
-  void whenMixedValidAndInvalidPorts_thenShouldOnlyProcessValidPorts() {
-    // given
-    Map<String, String> mixedHeaders = new HashMap<>();
-    mixedHeaders.put("service-a-forwarded-port", "8081");  // valid
-    mixedHeaders.put("service-b-forwarded-port", "abc");   // invalid format
-    mixedHeaders.put("invalid-header", "8082");            // invalid key
-    mixedHeaders.put("service-c-forwarded-port", "0");     // invalid range
-    mixedHeaders.put("service-d-forwarded-port", "8084");  // valid
+    private static class InvalidKeyTestCase {
+        String key;
+        int port;
+        String description;
 
-    // when
-    context.extractAndProcessForwardedPorts(mixedHeaders);
-
-    // then
-    assertThat(context.getAttributes())
-      .hasSize(2)
-      .containsEntry("service-a-forwarded-port", 8081)
-      .containsEntry("service-d-forwarded-port", 8084);
-  }
+        InvalidKeyTestCase(String key, int port, String description) {
+            this.key = key;
+            this.port = port;
+            this.description = description;
+        }
+    }
 }

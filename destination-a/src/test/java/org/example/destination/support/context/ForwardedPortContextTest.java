@@ -1,11 +1,12 @@
 package org.example.destination.support.context;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -132,7 +133,7 @@ class ForwardedPortContextTest {
       assertThat(completed).isTrue();
       assertThat(collectedPorts)
         .hasSize(THREAD_COUNT)
-        .allSatisfy(port -> 
+        .allSatisfy(port ->
           assertThat(port).isBetween(8080, 8080 + THREAD_COUNT - 1)
         );
     } finally {
@@ -173,7 +174,7 @@ class ForwardedPortContextTest {
       assertThat(completed).isTrue();
       assertThat(collectedPorts)
         .hasSize(VIRTUAL_THREAD_COUNT)
-        .allSatisfy(port -> 
+        .allSatisfy(port ->
           assertThat(port).isBetween(8080, 8080 + VIRTUAL_THREAD_COUNT - 1)
         );
     } finally {
