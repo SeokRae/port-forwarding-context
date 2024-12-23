@@ -29,33 +29,26 @@ public class RestTemplateHelper {
   public <R> ResponseEntity<R> postRequest(
     String domain,
     String path,
-    HttpHeaders httpHeaders,
+    HttpHeaders originalHeaders,
     HttpMethod httpMethod,
     Map<String, Object> pathVariables,
     String requestBody,
     Class<R> responseType
   ) {
 
-    ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getB().getHeader().getKey();
-    Integer port = context.getAttribute(headerKey, Integer.class).orElse(null);
 
-    context.getAttributes()
-      .entrySet()
-      .stream()
-      .filter(entry -> !entry.getKey().equals(headerKey))
-      .forEach(entry -> httpHeaders.add(entry.getKey(), String.valueOf(entry.getValue())));
-    if (port == null) {
-      log.error("Port information is missing in the context. Header Key: {}", headerKey);
-      httpHeaders.set(headerKey, String.valueOf(port));
-    }
+    HttpHeaders headers = createHeaders(originalHeaders, headerKey);
+    Integer forwardedPort = getForwardedPort(headerKey);
 
-    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
-    String uriString = urlTemplateBuilder.buildUriComponents(domain, path, port, pathVariables).toUriString();
+    HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
-    log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}", uriString, httpMethod, httpHeaders, requestBody);
+    String uriString = urlTemplateBuilder.buildUriComponents(domain, path, forwardedPort, pathVariables).toUriString();
+
+    log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}",
+      uriString, httpMethod, headers, requestBody);
+
     try {
-
       ResponseEntity<R> responseEntity = restTemplate.exchange(
         uriString,
         httpMethod,
@@ -63,24 +56,80 @@ public class RestTemplateHelper {
         responseType
       );
 
-      if (responseEntity.getBody() != null) {
-        log.info("[Response] Status: {}, Body: {}", responseEntity.getStatusCode(), responseEntity.getBody());
-      } else {
-        log.info("[Response] Status: {}", responseEntity.getStatusCode());
-      }
-
+      logResponse(responseEntity);
       return responseEntity.getBody() != null ? responseEntity : null;
 
     } catch (HttpClientErrorException e) {
-      log.warn("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}", uriString, httpMethod, httpHeaders, requestBody, e.getResponseBodyAsString());
+      logClientError(uriString, httpMethod, headers, requestBody, e);
     } catch (HttpServerErrorException e) {
-      log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}", uriString, httpMethod, httpHeaders, requestBody, e.getResponseBodyAsString());
+      logServerError(uriString, httpMethod, headers, requestBody, e);
     } catch (ResourceAccessException e) {
-      log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}", uriString, httpMethod, httpHeaders, requestBody, e.getMessage());
+      logResourceAccessError(uriString, httpMethod, headers, requestBody, e);
     } catch (Exception e) {
-      log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}", uriString, httpMethod, httpHeaders, requestBody, e.getMessage());
+      logUnexpectedError(uriString, httpMethod, headers, requestBody, e);
       throw e;
     }
+
     throw new RuntimeException("Failed to request");
+  }
+
+  private HttpHeaders createHeaders(HttpHeaders originalHeaders, String headerKey) {
+    HttpHeaders headers = new HttpHeaders();
+    headers.addAll(originalHeaders);
+    addForwardedPortHeaders(headers, headerKey);
+    return headers;
+  }
+
+  private void addForwardedPortHeaders(HttpHeaders headers, String headerKey) {
+    Integer port = getForwardedPort(headerKey);
+
+    // 포트 관련 헤더 추가
+    ForwardedPortContext.getAttributes()
+      .entrySet()
+      .stream()
+      .filter(entry -> !entry.getKey().equals(headerKey))
+      .forEach(entry -> headers.add(entry.getKey(), String.valueOf(entry.getValue())));
+
+    if (port != null) {
+      log.info("Port forwarded from header key: {}, port: {}", headerKey, port);
+      headers.add(headerKey, String.valueOf(port));
+    }
+  }
+
+  private Integer getForwardedPort(String headerKey) {
+    return ForwardedPortContext.getAttribute(headerKey).orElse(null);
+  }
+
+  private <R> void logResponse(ResponseEntity<R> responseEntity) {
+    if (responseEntity.getBody() != null) {
+      log.info("[Response] Status: {}, Body: {}",
+        responseEntity.getStatusCode(), responseEntity.getBody());
+    } else {
+      log.info("[Response] Status: {}", responseEntity.getStatusCode());
+    }
+  }
+
+  private void logClientError(String uri, HttpMethod method, HttpHeaders headers,
+                              String body, HttpClientErrorException e) {
+    log.warn("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}",
+      uri, method, headers, body, e.getResponseBodyAsString());
+  }
+
+  private void logServerError(String uri, HttpMethod method, HttpHeaders headers,
+                              String body, HttpServerErrorException e) {
+    log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}",
+      uri, method, headers, body, e.getResponseBodyAsString());
+  }
+
+  private void logResourceAccessError(String uri, HttpMethod method, HttpHeaders headers,
+                                      String body, ResourceAccessException e) {
+    log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}",
+      uri, method, headers, body, e.getMessage());
+  }
+
+  private void logUnexpectedError(String uri, HttpMethod method, HttpHeaders headers,
+                                  String body, Exception e) {
+    log.error("[Request] URI: {}, Method: {}, Headers: {}, Body: {}, Response: {}",
+      uri, method, headers, body, e.getMessage());
   }
 }

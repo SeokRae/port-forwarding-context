@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.example.destination.core.props.ServiceProperties;
 import org.example.destination.core.props.UrisProperties;
+import org.example.destination.support.context.ForwardedPortContext;
 import org.example.destination.support.helper.RestTemplateHelper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -26,17 +27,16 @@ public class DestinationAController {
   @GetMapping("/target/path/a")
   public ResponseEntity<String> destinationA() {
 
+    String headerKey = serviceProperties.getB().getHeader().getKey();
+    Integer headerValue = ForwardedPortContext.getAttribute(headerKey).orElse(null);
+
     try {
       log.info("================================================== A Service Begin ==================================================");
-      return restTemplateHelper.postRequest(
-        serviceProperties.getB().getDomain(),
-        urisProperties.getDestination(),
-        HttpHeaders.EMPTY,
-        HttpMethod.GET,
-        new HashMap<>(),
-        Strings.EMPTY,
-        String.class
-      );
+      if (headerValue != null) {
+        log.info("Forwarded Port: {}", headerValue);
+        return routeB();
+      }
+      return ResponseEntity.ok().body("Destination A");
     } catch (RuntimeException e) {
       log.error("Error occurred while processing the request.", e);
       return ResponseEntity.internalServerError()
@@ -44,5 +44,20 @@ public class DestinationAController {
     } finally {
       log.info("================================================== A Service End ==================================================");
     }
+  }
+
+  private ResponseEntity<String> routeB() {
+    log.info("================================================== Routing B Begin ==================================================");
+    ResponseEntity<String> stringResponseEntity = restTemplateHelper.postRequest(
+      serviceProperties.getB().getDomain(),
+      urisProperties.getDestination(),
+      HttpHeaders.EMPTY,
+      HttpMethod.GET,
+      new HashMap<>(),
+      Strings.EMPTY,
+      String.class
+    );
+    log.info("================================================== Routing B End ==================================================");
+    return stringResponseEntity;
   }
 }
