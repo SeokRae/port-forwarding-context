@@ -1,5 +1,6 @@
 package org.example.destination.support.validator;
 
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.destination.core.props.ServiceProperties;
@@ -27,7 +28,7 @@ public class ForwardedPortValidator {
       log.warn("Invalid header name: {}, value: {}", headerName, headerValue);
       return;
     }
-    if (!validateKeyAndPort(headerName, headerValue)) {
+    if (!validatePort(headerName, headerValue)) {
       log.warn("Invalid key: null or empty");
       return;
     }
@@ -40,17 +41,7 @@ public class ForwardedPortValidator {
   /**
    * 헤더 키와 포트값의 유효성 검증
    */
-  private boolean validateKeyAndPort(String key, String portValue) {
-    if (key == null || key.trim().isEmpty()) {
-      return false;
-    }
-
-    String configuredKey = serviceProperties.getB().getHeader().getKey();
-    if (!key.equals(configuredKey)) {
-      log.warn("Invalid header key: '{}'. Expected: '{}'", key, configuredKey);
-      return false;
-    }
-
+  private boolean validatePort(String key, String portValue) {
     if (portValue == null || portValue.trim().isEmpty()) {
       log.warn("Port value is null or empty for key: '{}'", key);
       return false;
