@@ -1,4 +1,4 @@
-package org.example.source.support.helper;
+package org.example.source.support.http;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,7 @@ import java.util.Map;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RestTemplateHelper {
+public class RestTemplateHandler {
 
   private final RestTemplate restTemplate;
   private final UrlTemplateBuilder urlTemplateBuilder;

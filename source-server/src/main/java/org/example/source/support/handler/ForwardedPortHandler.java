@@ -1,24 +1,22 @@
-package org.example.source.support.validator;
+package org.example.source.support.handler;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.source.core.props.ServiceProperties;
 import org.example.source.support.context.ForwardedPortContext;
+import org.example.source.support.validator.PortValidator;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class ForwardedPortValidator {
+public class ForwardedPortHandler {
   private static final int MIN_PORT = 1;
   private static final int MAX_PORT = 65535;
   private static final String PORT_HEADER_SUFFIX = "forwarded-port";
   private static final String PORT_HEADER_PATTERN = "^[a-zA-Z0-9-]+-" + PORT_HEADER_SUFFIX + "$";
 
-  private final ServiceProperties serviceProperties;
+  private final PortValidator portValidator;
 
   /**
    * 헤더 정보를 검증하고 Context에 저장
@@ -49,12 +47,11 @@ public class ForwardedPortValidator {
 
     try {
       int port = Integer.parseInt(portValue.trim());
-      List<Integer> allowedPorts = serviceProperties.getA().getHeader().getPorts();
-      if (!allowedPorts.contains(port)) {
-        log.warn("Port {} is not in the allowed ports list: {}", port, allowedPorts);
+      if (!portValidator.isValidPort(port)) {
+        log.warn("Port {} is not in the allowed ports list", port);
         return false;
       }
-      return isValidPort(port);
+      return isValidPortRange(port);
     } catch (NumberFormatException e) {
       log.error("Invalid port value format - Key: '{}', Value: '{}'", key, portValue);
       return false;
@@ -65,7 +62,7 @@ public class ForwardedPortValidator {
     return headerName != null && headerName.matches(PORT_HEADER_PATTERN);
   }
 
-  private boolean isValidPort(int port) {
+  private boolean isValidPortRange(int port) {
     return port >= MIN_PORT && port <= MAX_PORT;
   }
 } 

@@ -6,7 +6,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.example.destination.core.props.ServiceProperties;
 import org.example.destination.core.props.UrisProperties;
 import org.example.destination.support.context.ForwardedPortContext;
-import org.example.destination.support.helper.RestTemplateHelper;
+import org.example.destination.support.http.RestTemplateHandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class DestinationAController {
 
-  private final RestTemplateHelper restTemplateHelper;
+  private final RestTemplateHandler restTemplateHandler;
   private final ServiceProperties serviceProperties;
   private final UrisProperties urisProperties;
 
@@ -48,7 +48,7 @@ public class DestinationAController {
 
   private ResponseEntity<String> routeB() {
     log.info("================================================== Routing B Begin ==================================================");
-    ResponseEntity<String> stringResponseEntity = restTemplateHelper.postRequest(
+    ResponseEntity<String> stringResponseEntity = restTemplateHandler.postRequest(
       serviceProperties.getB().getDomain(),
       urisProperties.getDestination(),
       HttpHeaders.EMPTY,

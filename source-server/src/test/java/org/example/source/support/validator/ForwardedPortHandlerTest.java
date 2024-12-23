@@ -2,6 +2,7 @@ package org.example.source.support.validator;
 
 import org.example.source.core.props.ServiceProperties;
 import org.example.source.support.context.ForwardedPortContext;
+import org.example.source.support.handler.ForwardedPortHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,13 +18,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @DisplayName("ForwardedPortValidator 테스트")
-class ForwardedPortValidatorTest {
+class ForwardedPortHandlerTest {
 
     @Autowired
     private ServiceProperties serviceProperties;
 
     @Autowired
-    private ForwardedPortValidator validator;
+    private ForwardedPortHandler validator;
 
     @AfterEach
     void tearDown() {

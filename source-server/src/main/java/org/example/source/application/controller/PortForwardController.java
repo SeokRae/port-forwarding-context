@@ -6,7 +6,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.example.source.core.props.ServiceProperties;
 import org.example.source.core.props.UrisProperties;
 import org.example.source.support.context.ForwardedPortContext;
-import org.example.source.support.helper.RestTemplateHelper;
+import org.example.source.support.http.RestTemplateHandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 public class PortForwardController {
 
-  private final RestTemplateHelper restTemplateHelper;
+  private final RestTemplateHandler restTemplateHandler;
   private final ServiceProperties serviceProperties;
   private final UrisProperties urisProperties;
 
@@ -44,7 +44,7 @@ public class PortForwardController {
 
     log.info("Forwarding request to service: {}, port: {}", headerKey, port);
 
-    return restTemplateHelper.postRequest(
+    return restTemplateHandler.postRequest(
       serviceProperties.getA().getDomain(),
       urisProperties.getDestination(),
       HttpHeaders.EMPTY,
