@@ -29,7 +29,7 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
     long duration = endTime - startTime; // 처리 시간 계산
 
     if (log.isInfoEnabled()) {
-      log.info("Processing time: {} ms", duration); // 처리 시간 로깅
+      log.info("Finally External Call Processing time: {} ms", duration); // 처리 시간 로깅
     }
 
     return response;

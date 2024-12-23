@@ -34,7 +34,9 @@ public class ForwardedPortContext {
   }
 
   public <T> Optional<T> getAttribute(String key, Class<T> type) {
-    return Optional.ofNullable(contextData.get(key)).filter(type::isInstance).map(type::cast);
+    return Optional.ofNullable(contextData.get(key))
+      .filter(type::isInstance)
+      .map(type::cast);
   }
 
   public Map<String, Object> getAttributes() {

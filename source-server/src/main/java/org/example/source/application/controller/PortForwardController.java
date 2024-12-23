@@ -36,7 +36,7 @@ public class PortForwardController {
     ForwardedPortContext context = ForwardedPortContext.getContext();
     String headerKey = serviceProperties.getA().getHeader().getKey();
 
-    Integer port = context.getAttribute(headerKey, Integer.class).orElse(null);
+    Integer port = context.getAttribute(headerKey).orElse(null);
 
     if (port == null) {
       log.error("Port information is missing in the context. Header Key: {}", headerKey);

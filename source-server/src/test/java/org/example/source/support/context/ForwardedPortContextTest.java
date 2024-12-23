@@ -84,13 +84,13 @@ class ForwardedPortContextTest {
     // then
     if (testCase.shouldStore) {
       context
-        .getAttribute(testCase.key, Integer.class)
+        .getAttribute(testCase.key)
         .ifPresent(port -> {
           assertThat(port).isEqualTo(testCase.port);
         });
     } else {
       context
-        .getAttribute(testCase.key, Integer.class)
+        .getAttribute(testCase.key)
         .ifPresent(port -> {
           assertThat(port).isNotEqualTo(testCase.port);
         });
@@ -111,7 +111,7 @@ class ForwardedPortContextTest {
 
       // then
       ForwardedPortContext.getContext()
-        .getAttribute(testCase.key, Integer.class)
+        .getAttribute(testCase.key)
         .ifPresent(port -> assertThat(port).isEqualTo(testCase.threadPort));
     });
 
@@ -120,7 +120,7 @@ class ForwardedPortContextTest {
 
     // then
     ForwardedPortContext.getContext()
-      .getAttribute(testCase.key, Integer.class)
+      .getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.mainPort));
   }
 
@@ -135,7 +135,7 @@ class ForwardedPortContextTest {
     context.clear();
 
     // then
-    context.getAttribute(testCase.key, Integer.class)
+    context.getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.port));
   }
 
@@ -150,7 +150,7 @@ class ForwardedPortContextTest {
     ForwardedPortContext currentContext = ForwardedPortContext.getContext();
 
     // then
-    context.getAttribute(testCase.key, Integer.class)
+    context.getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.port));
   }
 }

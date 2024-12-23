@@ -2,7 +2,9 @@ package org.example.destination.support.helper;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.destination.core.props.ServiceProperties;
 import org.example.destination.support.builder.UrlTemplateBuilder;
+import org.example.destination.support.context.ForwardedPortContext;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -22,17 +24,32 @@ public class RestTemplateHelper {
 
   private final RestTemplate restTemplate;
   private final UrlTemplateBuilder urlTemplateBuilder;
+  private final ServiceProperties serviceProperties;
 
   public <R> ResponseEntity<R> postRequest(
     String domain,
     String path,
-    Integer port,
     HttpHeaders httpHeaders,
     HttpMethod httpMethod,
     Map<String, Object> pathVariables,
     String requestBody,
     Class<R> responseType
   ) {
+
+    ForwardedPortContext context = ForwardedPortContext.getContext();
+    String headerKey = serviceProperties.getB().getHeader().getKey();
+    Integer port = context.getAttribute(headerKey, Integer.class).orElse(null);
+
+    context.getAttributes()
+      .entrySet()
+      .stream()
+      .filter(entry -> !entry.getKey().equals(headerKey))
+      .forEach(entry -> httpHeaders.add(entry.getKey(), String.valueOf(entry.getValue())));
+    if (port == null) {
+      log.error("Port information is missing in the context. Header Key: {}", headerKey);
+      httpHeaders.set(headerKey, String.valueOf(port));
+    }
+
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, httpHeaders);
     String uriString = urlTemplateBuilder.buildUriComponents(domain, path, port, pathVariables).toUriString();
 
