@@ -7,6 +7,7 @@ import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -20,10 +21,8 @@ public class UrlTemplateBuilder {
       .host(domain)
       .path(path);
 
-    if (port != null) {
-      log.info("Using port: {}", port);
-      uriBuilder.port(port);
-    }
+    Optional.ofNullable(port)
+      .ifPresent(uriBuilder::port);
 
     return pathVariables != null && !pathVariables.isEmpty()
       ? uriBuilder.buildAndExpand(pathVariables)
