@@ -38,7 +38,7 @@ public class ForwardedPortProcessingFilter implements Filter {
       log.error("Error occurred while processing request", e);
     } finally {
       logRequestEnd(startTime);
-      /* 필수 ForwardedPort에 대한 컨테이너를 비워야 함 */
+      /* 필수 ForwardedPort에 대한 컨테이너를 비워 메모리 누수 방지 */
       context.clear();
     }
   }
@@ -56,6 +56,11 @@ public class ForwardedPortProcessingFilter implements Filter {
     ForwardedPortContext.getContext().extractAndProcessForwardedPorts(forwardedPortHeaders);
   }
 
+  /**
+   * 요청 헤더 정보 로깅
+   *
+   * @param request
+   */
   private void logRequestStart(HttpServletRequest request) {
     String headers = Collections.list(request.getHeaderNames()).stream()
       .collect(Collectors.toMap(

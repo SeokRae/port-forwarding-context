@@ -20,10 +20,15 @@ public class ForwardedPortContext {
   private static final String PORT_HEADER_PATTERN = "^[a-zA-Z0-9-]+-" + PORT_HEADER_SUFFIX + "$";
   private static final String PORT_HEADER_SUFFIX_LOWER = PORT_HEADER_SUFFIX.toLowerCase();
 
-  private static final ThreadLocal<ForwardedPortContext> CONTEXT = new ThreadLocal<>();
+  private static final ThreadLocal<ForwardedPortContext> CONTEXT = ThreadLocal.withInitial(ForwardedPortContext::new);
 
   private final Map<String, Integer> contextData = new ConcurrentHashMap<>();
 
+  /**
+   * 현재 스레드에 대한 Context만 반환
+   *
+   * @return
+   */
   public static ForwardedPortContext getContext() {
     return Optional.ofNullable(CONTEXT.get()).orElseGet(() -> {
       ForwardedPortContext context = new ForwardedPortContext();
@@ -118,7 +123,7 @@ public class ForwardedPortContext {
       }
       return true;
     } catch (NumberFormatException e) {
-      log.error("Invalid port value format - Key: '{}', Value: '{}'", key, portValue);
+      log.warn("Invalid port value format - Key: '{}', Value: '{}'", key, portValue);
       return false;
     }
   }
@@ -139,7 +144,7 @@ public class ForwardedPortContext {
     String lowerHeaderName = headerName.toLowerCase();
     // 헤더 이름이 forwarded-port로 끝나지 않는 경우
     if (!lowerHeaderName.endsWith(PORT_HEADER_SUFFIX_LOWER)) {
-      log.warn("Header '{}' must end with '{}'", headerName, PORT_HEADER_SUFFIX);
+      log.warn("Invalid Header '{}' must end with '{}'", headerName, PORT_HEADER_SUFFIX);
       return false;
     }
     // 헤더 이름이 특정 패턴을 따르지 않는 경우
