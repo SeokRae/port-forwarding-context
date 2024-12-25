@@ -3,7 +3,6 @@ package org.example.source.core.interceptor;
 
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpRequest;
 import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
@@ -11,7 +10,6 @@ import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.util.StreamUtils;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -52,49 +50,8 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
       log.info("Status code  : {}", response.getStatusCode());
       log.info("Status text  : {}", response.getStatusText());
       log.info("Headers      : {}", response.getHeaders());
-      // 파일 다운로드 여부 판단
-      boolean isFileDownload = isFileDownloadResponse(response);
-      if (isFileDownload) {
-        // 파일 다운로드 로깅
-        logFileDownloadResponse(response);
-      } else {
-        // 일반 API 응답 로깅
-        logApiResponse(response);
-      }
+      log.info("Response body: {}", StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
       log.info("================================================== Response End ==================================================");
     }
-  }
-
-  // 파일 다운로드 여부 판단
-  private boolean isFileDownloadResponse(ClientHttpResponse response) {
-    HttpHeaders headers = response.getHeaders();
-    String contentType = headers.getContentType() != null ? headers.getContentType().toString() : "";
-    String contentDisposition = headers.getFirst("Content-Disposition");
-
-    // 파일 다운로드 조건: Content-Type 또는 Content-Disposition에 따라 판단
-    return contentType.contains("application/octet-stream") ||
-      (contentDisposition != null && contentDisposition.toLowerCase().contains("attachment"));
-  }
-
-  // 파일 다운로드 로깅
-  private void logFileDownloadResponse(ClientHttpResponse response) throws IOException {
-    log.info("This response contains a file download.");
-    InputStream inputStream = response.getBody();
-
-    // 파일 크기 확인 (가능한 경우)
-    int byteCount = 0;
-    byte[] buffer = new byte[1024];
-    while (inputStream.read(buffer) != -1) {
-      byteCount += buffer.length;
-    }
-
-    log.info("Downloaded file size (approx): {} bytes", byteCount);
-
-  }
-
-  // 일반 API 응답 로깅
-  private void logApiResponse(ClientHttpResponse response) throws IOException {
-    String responseBody = StreamUtils.copyToString(response.getBody(), Charset.defaultCharset());
-    log.info("Response body: {}", responseBody);
   }
 }
