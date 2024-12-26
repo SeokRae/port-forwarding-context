@@ -36,7 +36,6 @@ public class DestinationAController {
         log.info("Forwarded Port: {}", headerValue);
         return routeB();
       }
-      return ResponseEntity.ok().body("Destination A");
     } catch (RuntimeException e) {
       log.error("Error occurred while processing the request.", e);
       return ResponseEntity.internalServerError()
@@ -44,6 +43,7 @@ public class DestinationAController {
     } finally {
       log.info("================================================== A Service End ==================================================");
     }
+    return ResponseEntity.ok().body("Destination A");
   }
 
   private ResponseEntity<String> routeB() {

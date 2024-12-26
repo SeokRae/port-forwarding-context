@@ -3,6 +3,20 @@ spring:
     name: source-server
 
 service:
+  # 공통 검증 값 설정
+  forwarding:
+    headers:
+      # 헤더 패턴 정의
+      patterns:
+        suffix: "forwarded-port"
+        pattern: "^[a-zA-Z0-9-]+-${service.forwarding.headers.patterns.suffix}$"
+      # 포트 패턴 정의
+      ports:
+        pattern: "^[0-9]+$"
+        # 포트 범위 정의
+        range:
+          min: 8081
+          max: 8082
   a:
     name: service-a
     domain: localhost

@@ -1,4 +1,4 @@
-package org.example.destination.core.props;
+package org.example.source.core.props;
 
 import lombok.Getter;
 import lombok.ToString;

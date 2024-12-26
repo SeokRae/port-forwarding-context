@@ -2,8 +2,6 @@ package org.example.destination.support.validator;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.destination.core.props.ForwardPort;
-import org.example.destination.core.props.ForwardPortHeader;
 import org.example.destination.core.props.ForwardPortProperties;
 import org.springframework.stereotype.Component;
 
@@ -23,10 +21,10 @@ public class ForwardedPortValidator implements PortValidator {
   private final Integer maxPort;
 
   public ForwardedPortValidator(ForwardPortProperties forwardPortProperties) {
-    ForwardPortHeader headers = forwardPortProperties.getHeaders();
+    ForwardPortProperties.ForwardPortHeader headers = forwardPortProperties.getHeaders();
     this.headerPattern = Pattern.compile(headers.getPatterns().getPattern());
 
-    ForwardPort ports = headers.getPorts();
+    ForwardPortProperties.ForwardPortHeader.ForwardPort ports = headers.getPorts();
     this.portPattern = Pattern.compile(ports.getPattern());
     this.minPort = ports.getRange().getMin();
     this.maxPort = ports.getRange().getMax();
@@ -56,7 +54,7 @@ public class ForwardedPortValidator implements PortValidator {
     }
 
     if (!headerPattern.matcher(headerName).matches()) {
-      log.debug("[Validation] Invalid header name: '{}', pattern: {}", 
+      log.debug("[Validation] Invalid header name: '{}', pattern: {}",
         headerName, headerPattern);
       return false;
     }
@@ -80,7 +78,7 @@ public class ForwardedPortValidator implements PortValidator {
     }
 
     if (!portPattern.matcher(portValue.trim()).matches()) {
-      log.debug("[Validation] Port value '{}' does not match pattern: {}", 
+      log.debug("[Validation] Port value '{}' does not match pattern: {}",
         portValue, portPattern);
       return false;
     }
@@ -96,7 +94,7 @@ public class ForwardedPortValidator implements PortValidator {
 
   private boolean validatePortRange(int port) {
     if (port < minPort || port > maxPort) {
-      log.debug("[Validation] Port {} is outside allowed range [{}-{}]", 
+      log.debug("[Validation] Port {} is outside allowed range [{}-{}]",
         port, minPort, maxPort);
       return false;
     }
