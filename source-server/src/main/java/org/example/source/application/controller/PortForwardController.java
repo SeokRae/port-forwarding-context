@@ -34,15 +34,10 @@ public class PortForwardController {
   @GetMapping("/forward")
   public ResponseEntity<String> forward() {
 
-    String headerKey = serviceProperties.getA().getHeader().getKey();
-    Integer port = ForwardedPortContext.getAttribute(headerKey).orElse(null);
-
-    if (port == null) {
-      log.error("Port information is missing in the context. Header Key: {}", headerKey);
+    if (ForwardedPortContext.isEmpty()) {
+      log.error("Port information is missing in the context.");
       return ResponseEntity.badRequest().body("Invalid or missing port information.");
     }
-
-    log.info("Forwarding request to service: {}, port: {}", headerKey, port);
 
     return restTemplateHandler.postRequest(
       serviceProperties.getA().getDomain(),
@@ -55,13 +50,4 @@ public class PortForwardController {
     );
   }
 
-  private HttpHeaders createHeaders(ForwardedPortContext context, String excludeKey) {
-    HttpHeaders headers = new HttpHeaders();
-    context.getAttributes()
-      .entrySet()
-      .stream()
-      .filter(entry -> !entry.getKey().equals(excludeKey))
-      .forEach(entry -> headers.add(entry.getKey(), String.valueOf(entry.getValue())));
-    return headers;
-  }
 }

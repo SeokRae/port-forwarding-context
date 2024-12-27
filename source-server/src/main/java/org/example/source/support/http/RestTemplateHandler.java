@@ -2,9 +2,8 @@ package org.example.source.support.http;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.source.core.props.ServiceProperties;
 import org.example.source.support.builder.UrlTemplateBuilder;
-import org.example.source.support.context.ForwardedPortContext;
+import org.example.source.support.handler.HttpHeaderHandler;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -24,7 +23,7 @@ public class RestTemplateHandler {
 
   private final RestTemplate restTemplate;
   private final UrlTemplateBuilder urlTemplateBuilder;
-  private final ServiceProperties serviceProperties;
+  private final HttpHeaderHandler httpHeaderHandler;
 
   public <R> ResponseEntity<R> postRequest(
     String domain,
@@ -36,10 +35,8 @@ public class RestTemplateHandler {
     Class<R> responseType
   ) {
 
-    String headerKey = serviceProperties.getA().getHeader().getKey();
-
-    HttpHeaders headers = createHeaders(httpHeaders, headerKey);
-    Integer forwardedPort = getForwardedPort(headerKey);
+    HttpHeaders headers = httpHeaderHandler.createHeaders(httpHeaders);
+    Integer forwardedPort = httpHeaderHandler.getForwardedPort().orElse(null);
 
     HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, headers);
 
@@ -74,33 +71,6 @@ public class RestTemplateHandler {
       throw e;
     }
     throw new RuntimeException("Failed to request");
-  }
-
-  private HttpHeaders createHeaders(HttpHeaders originalHeaders, String headerKey) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.addAll(originalHeaders);
-    addForwardedPortHeaders(headers, headerKey);
-    return headers;
-  }
-
-  private void addForwardedPortHeaders(HttpHeaders headers, String headerKey) {
-    Integer port = getForwardedPort(headerKey);
-
-    // 포트 관련 헤더 추가
-    ForwardedPortContext.getAttributes()
-      .entrySet()
-      .stream()
-      .filter(entry -> !entry.getKey().equals(headerKey))
-      .forEach(entry -> headers.add(entry.getKey(), String.valueOf(entry.getValue())));
-
-    if (port != null) {
-      log.info("Port forwarded from header key: {}, port: {}", headerKey, port);
-      headers.add(headerKey, String.valueOf(port));
-    }
-  }
-
-  private Integer getForwardedPort(String headerKey) {
-    return ForwardedPortContext.getAttribute(headerKey).orElse(null);
   }
 
 }

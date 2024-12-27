@@ -48,6 +48,10 @@ public class ForwardedPortContext {
     CONTEXT.remove();
   }
 
+  public static boolean isEmpty() {
+    return CONTEXT.get().isEmpty();
+  }
+
   private static class ContextHolder {
     private final Map<String, Integer> contextData = new ConcurrentHashMap<>();
 
@@ -66,6 +70,10 @@ public class ForwardedPortContext {
 
     private void removeAttribute(String key) {
       contextData.remove(key);
+    }
+
+    private boolean isEmpty() {
+      return contextData.isEmpty();
     }
   }
 }
