@@ -29,7 +29,9 @@ class PortForwardControllerTest {
   void testMultiplePortForwarding() throws Exception {
     mockMvc.perform(get("/port/forward")
         .header("service-a-forwarded-port", 8081)
-        .header("service-b-forwarded-port", 8082))
+        .header("service-b-forwarded-port", 8082)
+        .header("service-c-forwarded-port", 8082)
+      )
       .andExpect(status().isOk())
       .andExpect(content().string("Destination B"));
   }

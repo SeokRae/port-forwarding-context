@@ -23,6 +23,7 @@ public class RestTemplateHandler {
 
   private final RestTemplate restTemplate;
   private final UrlTemplateBuilder urlTemplateBuilder;
+  // 헤더 만들기, 포트가져오기 -> Context
   private final HttpHeaderHandler httpHeaderHandler;
 
   public <R> ResponseEntity<R> postRequest(

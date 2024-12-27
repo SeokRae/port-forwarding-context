@@ -35,10 +35,12 @@ public class ForwardedPortValidator implements PortValidator {
 
   @Override
   public boolean isValidForwardedPort(String headerName, String portValue) {
+    // 헤더(키) 검증
     if (!validateHeader(headerName)) {
       return false;
     }
 
+    // 헤더(값) 검증
     if (!validatePort(portValue)) {
       return false;
     }
@@ -62,6 +64,7 @@ public class ForwardedPortValidator implements PortValidator {
     return true;
   }
 
+  // null, empty, 숫자 포맷
   private boolean validatePort(String portValue) {
     if (!validatePortFormat(portValue)) {
       return false;
@@ -92,6 +95,7 @@ public class ForwardedPortValidator implements PortValidator {
     }
   }
 
+  // 포트 범위
   private boolean validatePortRange(int port) {
     if (port < minPort || port > maxPort) {
       log.debug("[Validation] Port {} is outside allowed range [{}-{}]",

@@ -1,10 +1,10 @@
-package org.example.source.support.handler;
+package org.example.destination.support.handler;
 
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.source.core.props.ServiceProperties;
-import org.example.source.support.context.ForwardedPortContext;
+import org.example.destination.core.props.ServiceProperties;
+import org.example.destination.support.context.ForwardedPortContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
@@ -40,12 +40,12 @@ public class HttpHeaderHandler {
   }
 
   public String getCurrentServiceHeaderKey() {
-    return serviceProperties.getA().getHeader().getKey();
+    return serviceProperties.getB().getHeader().getKey();
   }
 
   public Optional<Integer> getForwardedPort() {
     String headerKey = getCurrentServiceHeaderKey();
-    List<Integer> allowedPorts = serviceProperties.getA().getHeader().getPorts();
+    List<Integer> allowedPorts = serviceProperties.getB().getHeader().getPorts();
 
     return ForwardedPortContext.getAttribute(headerKey)
       .filter(port -> isValidPort(port, allowedPorts))

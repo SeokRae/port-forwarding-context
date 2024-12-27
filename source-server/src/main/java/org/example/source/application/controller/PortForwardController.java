@@ -42,6 +42,7 @@ public class PortForwardController {
     return restTemplateHandler.postRequest(
       serviceProperties.getA().getDomain(),
       urisProperties.getDestination(),
+      // UNT_API 헤더를 추가한다.
       HttpHeaders.EMPTY,
       HttpMethod.GET,
       new HashMap<>(),

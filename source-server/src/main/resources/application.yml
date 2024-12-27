@@ -6,7 +6,7 @@ service:
   # 공통 검증 값 설정
   forwarding:
     headers:
-      # 헤더 패턴 정의
+      # 헤더 패턴 정의 '서비스명-포트포워딩' 네임
       patterns:
         suffix: "forwarded-port"
         pattern: "^[a-zA-Z0-9-]+-${service.forwarding.headers.patterns.suffix}$"
@@ -22,7 +22,7 @@ service:
     domain: localhost
     header:
       key: ${service.a.name}-forwarded-port
-      ports: [ 8081, 8082 ]
+      ports: [ 8081, 8082 ] # 검증 필요
 
 uris:
   destination: /target/path/a
