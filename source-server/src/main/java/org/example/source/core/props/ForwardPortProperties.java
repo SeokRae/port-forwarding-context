@@ -18,21 +18,21 @@ public class ForwardPortProperties {
   @Getter
   @ToString
   public static class ForwardPortHeader {
-    private final ForwardPortPattern patterns;
+    private final ForwardPortHeaderPattern patterns;
     private final ForwardPort ports;
 
-    public ForwardPortHeader(ForwardPortPattern patterns, ForwardPort ports) {
+    public ForwardPortHeader(ForwardPortHeaderPattern patterns, ForwardPort ports) {
       this.patterns = patterns;
       this.ports = ports;
     }
 
     @Getter
     @ToString
-    public static class ForwardPortPattern {
+    public static class ForwardPortHeaderPattern {
       private final String suffix;
       private final String pattern;
 
-      public ForwardPortPattern(String suffix, String pattern) {
+      public ForwardPortHeaderPattern(String suffix, String pattern) {
         this.suffix = suffix;
         this.pattern = pattern;
       }
