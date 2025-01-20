@@ -1,8 +1,8 @@
-package org.example.destination.support.validator;
+package org.example.inbound.support.validator;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.example.destination.core.props.ForwardPortProperties;
+import org.example.inbound.core.props.ForwardedPortConfigProperties;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
@@ -20,14 +20,12 @@ public class ForwardedPortValidator implements PortValidator {
   private final Integer minPort;
   private final Integer maxPort;
 
-  public ForwardedPortValidator(ForwardPortProperties forwardPortProperties) {
-    ForwardPortProperties.ForwardPortHeader headers = forwardPortProperties.getHeaders();
-    this.headerPattern = Pattern.compile(headers.getPatterns().getPattern());
+  public ForwardedPortValidator(ForwardedPortConfigProperties forwardedPortConfigProperties) {
 
-    ForwardPortProperties.ForwardPortHeader.ForwardPort ports = headers.getPorts();
-    this.portPattern = Pattern.compile(ports.getPattern());
-    this.minPort = ports.getRange().getMin();
-    this.maxPort = ports.getRange().getMax();
+    this.headerPattern = Pattern.compile(forwardedPortConfigProperties.getHeaderPattern());
+    this.portPattern = Pattern.compile(forwardedPortConfigProperties.getPortPattern());
+    this.minPort = forwardedPortConfigProperties.getMinPort();
+    this.maxPort = forwardedPortConfigProperties.getMaxPort();
 
     log.info("Initialized with port range: {}-{}, port pattern: {}, header pattern: {}",
       minPort, maxPort, portPattern, headerPattern);
@@ -35,10 +33,12 @@ public class ForwardedPortValidator implements PortValidator {
 
   @Override
   public boolean isValidForwardedPort(String headerName, String portValue) {
+    // 헤더(키) 검증
     if (!validateHeader(headerName)) {
       return false;
     }
 
+    // 헤더(값) 검증
     if (!validatePort(portValue)) {
       return false;
     }
@@ -62,6 +62,7 @@ public class ForwardedPortValidator implements PortValidator {
     return true;
   }
 
+  // null, empty, 숫자 포맷
   private boolean validatePort(String portValue) {
     if (!validatePortFormat(portValue)) {
       return false;
@@ -92,6 +93,7 @@ public class ForwardedPortValidator implements PortValidator {
     }
   }
 
+  // 포트 범위
   private boolean validatePortRange(int port) {
     if (port < minPort || port > maxPort) {
       log.debug("[Validation] Port {} is outside allowed range [{}-{}]",

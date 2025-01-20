@@ -1,4 +1,5 @@
 rootProject.name = 'forward'
+include 'filter-inbound-module'
 include 'source-server'
 include 'destination-a'
 include 'destination-b'

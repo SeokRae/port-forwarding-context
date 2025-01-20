@@ -4,7 +4,7 @@ package org.example.destination.support.handler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.destination.core.props.ServiceProperties;
-import org.example.destination.support.context.ForwardedPortContext;
+import org.example.inbound.support.context.ForwardedPortContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 

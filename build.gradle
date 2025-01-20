@@ -59,10 +59,22 @@ subprojects {
     }
 }
 
+project(':filter-inbound-module') {
+    // java-library 플러그인이 적용된 모듈은 subprojects 블록의 공통 설정을 상속받지 않습니다.
+    apply plugin: 'java-library'
+    dependencies {
+        api 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+
+    }
+}
+
 project(':source-server') {
 
     dependencies {
-
+        implementation project(':filter-inbound-module')
     }
 }
 
@@ -70,6 +82,7 @@ project(':source-server') {
 project(':destination-a') {
 
     dependencies {
+        implementation project(':filter-inbound-module')
     }
 }
 

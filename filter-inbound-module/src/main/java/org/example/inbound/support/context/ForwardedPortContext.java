@@ -1,4 +1,4 @@
-package org.example.source.support.context;
+package org.example.inbound.support.context;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,5 @@
-package org.example.destination.core.filter;
+package org.example.inbound.core.filter;
+
 
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
@@ -7,8 +8,8 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.destination.support.context.ForwardedPortContext;
-import org.example.destination.support.handler.ForwardedPortHandler;
+import org.example.inbound.support.context.ForwardedPortContext;
+import org.example.inbound.support.hanlder.ForwardedPortHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 @Component
 @RequiredArgsConstructor
 public class ForwardedPortProcessingFilter implements Filter {
+
   private final ForwardedPortHandler validator;
 
   @Override

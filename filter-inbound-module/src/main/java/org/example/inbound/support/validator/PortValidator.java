@@ -1,4 +1,4 @@
-package org.example.source.support.validator;
+package org.example.inbound.support.validator;
 
 @FunctionalInterface
 public interface PortValidator {

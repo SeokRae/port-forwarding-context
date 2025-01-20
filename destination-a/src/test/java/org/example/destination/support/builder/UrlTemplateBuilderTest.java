@@ -16,4 +16,15 @@ class UrlTemplateBuilderTest {
       .toUriString();
     System.out.println("uriString = " + uriString);
   }
+
+  @Test
+  void testCase2() {
+    String uriString = UriComponentsBuilder
+      .fromUriString("https://example.com")
+      .path("/path/{id}")
+      .port(null)
+      .buildAndExpand("2")
+      .toUriString();
+    System.out.println("uriString = " + uriString);
+  }
 }
