@@ -11,17 +11,24 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
-@Slf4j
 public class HttpHeaderHandler {
+
   private final ServiceProperties serviceProperties;
 
   public HttpHeaders createHeaders(HttpHeaders originalHeaders) {
-    HttpHeaders headers = new HttpHeaders();
-    headers.addAll(originalHeaders);
-    addForwardedPortHeaders(headers);
-    return headers;
+    try {
+      HttpHeaders headers = new HttpHeaders();
+      Optional.ofNullable(originalHeaders)
+        .ifPresent(headers::putAll);
+      addForwardedPortHeaders(headers);
+      return headers;
+    } catch (Exception e) {
+      log.error("Error occurred while creating headers", e);
+      return new HttpHeaders();
+    }
   }
 
   // 여기서 다음 서버로 보낼 헤더를 HttpHeaders에 저장
@@ -29,14 +36,18 @@ public class HttpHeaderHandler {
     // A 프로퍼티 헤더 key 값 조회
     String currentServiceHeaderKey = getCurrentServiceHeaderKey();
 
-    ForwardedPortContext.getAttributes().entrySet().stream()
-      .filter(entry -> !entry.getKey().equals(currentServiceHeaderKey))
-      .forEach(entry -> {
-        String key = entry.getKey();
-        Integer port = entry.getValue();
-        logPortForwarding(key, port);
-        headers.add(key, String.valueOf(port));
-      });
+    try {
+      ForwardedPortContext.getAttributes().entrySet().stream()
+        .filter(entry -> !entry.getKey().equals(currentServiceHeaderKey))
+        .forEach(entry -> {
+          String key = entry.getKey();
+          Integer port = entry.getValue();
+          logPortForwarding(key, port);
+          headers.add(key, String.valueOf(port));
+        });
+    } catch (Exception e) {
+      log.error("Error occurred while adding forwarded port headers", e);
+    }
   }
 
   public String getCurrentServiceHeaderKey() {

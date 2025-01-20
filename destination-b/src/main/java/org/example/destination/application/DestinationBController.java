@@ -8,10 +8,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/target")
+@RequestMapping("/target/path")
 public class DestinationBController {
 
-  @GetMapping("/path")
+  @GetMapping("/b")
   public ResponseEntity<String> destinationB() {
     log.info("Destination B");
     return ResponseEntity.ok("Destination B");

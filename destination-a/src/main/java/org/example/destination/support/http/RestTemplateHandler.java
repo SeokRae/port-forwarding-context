@@ -44,9 +44,9 @@ public class RestTemplateHandler {
 
     String uriString = urlTemplateBuilder.buildUriComponents(domain, path, forwardedPort, pathVariables).toUriString();
 
-    log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}", uriString, httpMethod, headers, requestBody);
     try {
 
+      log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}", uriString, httpMethod, headers, requestBody);
       ResponseEntity<R> responseEntity = restTemplate.exchange(
         uriString,
         httpMethod,

@@ -1,4 +1,4 @@
-rootProject.name = 'forward'
+rootProject.name = 'port-forwarding-context'
 include 'filter-inbound-module'
 include 'source-server'
 include 'destination-a'

@@ -1,6 +1,7 @@
 package org.example.destination.support.validator;
 
 import org.example.destination.core.props.ForwardPortProperties;
+import org.example.inbound.support.validator.ForwardedPortValidator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
