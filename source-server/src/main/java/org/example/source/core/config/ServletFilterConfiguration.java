@@ -1,7 +1,7 @@
 package org.example.source.core.config;
 
 import jakarta.servlet.DispatcherType;
-import org.example.inbound.core.filter.ForwardedPortProcessingFilter;
+import org.example.inbound.infrastructure.filter.ForwardedPortProcessingFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

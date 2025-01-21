@@ -1,7 +1,7 @@
 package org.example.source.support.validator;
 
-import org.example.inbound.support.context.ForwardedPortContext;
-import org.example.inbound.support.hanlder.ForwardedPortHandler;
+import org.example.inbound.infrastructure.context.ForwardedPortContext;
+import org.example.inbound.infrastructure.hanlder.ForwardedPortHandler;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

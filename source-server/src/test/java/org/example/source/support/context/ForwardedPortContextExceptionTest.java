@@ -1,6 +1,6 @@
 package org.example.source.support.context;
 
-import org.example.inbound.support.context.ForwardedPortContext;
+import org.example.inbound.infrastructure.context.ForwardedPortContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;

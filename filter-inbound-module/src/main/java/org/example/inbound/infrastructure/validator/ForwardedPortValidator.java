@@ -1,4 +1,4 @@
-package org.example.inbound.support.validator;
+package org.example.inbound.infrastructure.validator;
 
 
 import lombok.extern.slf4j.Slf4j;

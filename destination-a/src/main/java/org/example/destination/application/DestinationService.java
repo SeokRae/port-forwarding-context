@@ -6,7 +6,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.example.destination.core.props.ServiceProperties;
 import org.example.destination.core.props.UrisProperties;
 import org.example.destination.support.http.RestTemplateHandler;
-import org.example.inbound.support.context.ForwardedPortContext;
+import org.example.inbound.infrastructure.context.ForwardedPortContext;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
