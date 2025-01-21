@@ -1,4 +1,4 @@
-package org.example.destination.application;
+package org.example.destination.api;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

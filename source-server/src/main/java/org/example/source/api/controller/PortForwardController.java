@@ -1,4 +1,4 @@
-package org.example.source.application.controller;
+package org.example.source.api.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,7 +6,7 @@ import org.apache.logging.log4j.util.Strings;
 import org.example.inbound.infrastructure.context.ForwardedPortContext;
 import org.example.source.core.props.ServiceProperties;
 import org.example.source.core.props.UrisProperties;
-import org.example.source.support.http.RestTemplateHandler;
+import org.example.source.support.client.RestTemplateHandler;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;

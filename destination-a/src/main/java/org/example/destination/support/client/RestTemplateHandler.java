@@ -1,9 +1,10 @@
-package org.example.source.support.http;
+package org.example.destination.support.client;
+
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.example.source.support.builder.UrlTemplateBuilder;
-import org.example.source.support.handler.HttpHeaderHandler;
+import org.example.destination.support.builder.UrlTemplateBuilder;
+import org.example.destination.support.handler.HttpHeaderHandler;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -43,9 +44,9 @@ public class RestTemplateHandler {
 
     String uriString = urlTemplateBuilder.buildUriComponents(domain, path, forwardedPort, pathVariables).toUriString();
 
-    log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}", uriString, httpMethod, headers, requestBody);
     try {
 
+      log.info("[Request] URI: {}, Method: {}, Headers: {}, Body: {}", uriString, httpMethod, headers, requestBody);
       ResponseEntity<R> responseEntity = restTemplate.exchange(
         uriString,
         httpMethod,
