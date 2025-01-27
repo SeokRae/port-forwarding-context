@@ -7,7 +7,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@ComponentScan(basePackages = {"org.example.inbound", "org.example.destination"})
+@ComponentScan(basePackages = {
+  "org.example.inbound",
+  "org.example.destination",
+  "org.example.client.rest",
+})
 public class DestinationAApplication {
 
   public static void main(String[] args) {

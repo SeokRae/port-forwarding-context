@@ -1,5 +1,6 @@
 rootProject.name = 'port-forwarding-context'
 include 'filter-inbound-module'
+include 'outbound-rest-module'
 include 'source-server'
 include 'destination-a'
 include 'destination-b'

@@ -1,4 +1,4 @@
-package org.example.source.support.builder;
+package org.example.client.rest.infrastructures.support;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

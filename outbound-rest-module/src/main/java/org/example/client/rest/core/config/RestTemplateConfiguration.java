@@ -1,9 +1,7 @@
-package org.example.destination.core.config;
-
+package org.example.client.rest.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.extern.slf4j.Slf4j;
-import org.example.destination.core.interceptor.RestTemplateLoggingInterceptor;
+import org.example.client.rest.core.interceptor.RestTemplateLoggingInterceptor;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +12,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.Duration;
 
-@Slf4j
 @Configuration
 public class RestTemplateConfiguration {
 
@@ -24,7 +21,9 @@ public class RestTemplateConfiguration {
   }
 
   @Bean
-  public RestTemplate restTemplate(RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper) {
+  public RestTemplate restTemplate(
+    RestTemplateBuilder restTemplateBuilder, ObjectMapper objectMapper
+  ) {
     return restTemplateBuilder
       .requestFactory(() -> new BufferingClientHttpRequestFactory(new SimpleClientHttpRequestFactory()))
       // 5초 동안 응답이 없으면 예외 발생
@@ -35,4 +34,6 @@ public class RestTemplateConfiguration {
       .additionalMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
       .build();
   }
+
+
 }

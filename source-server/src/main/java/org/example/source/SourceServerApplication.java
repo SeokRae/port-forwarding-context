@@ -7,7 +7,11 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
-@ComponentScan(basePackages = {"org.example.inbound", "org.example.source"})
+@ComponentScan(basePackages = {
+  "org.example.inbound",
+  "org.example.source",
+  "org.example.client.rest",
+})
 public class SourceServerApplication {
 
   public static void main(String[] args) {

@@ -1,4 +1,4 @@
-package org.example.source.core.interceptor;
+package org.example.client.rest.core.interceptor;
 
 
 import lombok.NonNull;
@@ -50,8 +50,13 @@ public class RestTemplateLoggingInterceptor implements ClientHttpRequestIntercep
       log.info("Status code  : {}", response.getStatusCode());
       log.info("Status text  : {}", response.getStatusText());
       log.info("Headers      : {}", response.getHeaders());
-      log.info("Response body: {}", StreamUtils.copyToString(response.getBody(), Charset.defaultCharset()));
+      logApiResponse(response);
       log.info("================================================== Response End ==================================================");
     }
+  }
+
+  private void logApiResponse(ClientHttpResponse response) throws IOException {
+    String responseBody = StreamUtils.copyToString(response.getBody(), Charset.defaultCharset());
+    log.info("Response body: {}", responseBody);
   }
 }
