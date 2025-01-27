@@ -1,17 +1,24 @@
 package org.example.source.support.context;
 
 import org.example.inbound.infrastructure.context.ForwardedPortContext;
+import org.example.inbound.infrastructure.validator.ForwardedPortValidator;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SpringBootTest
 @DisplayName("포트 처리 예외 테스트")
 class ForwardedPortContextExceptionTest {
+
+  @Autowired
+  private ForwardedPortValidator validator;
 
   @AfterEach
   void tearDown() {
@@ -52,13 +59,10 @@ class ForwardedPortContextExceptionTest {
   @DisplayName("유효하지 않은 포트값 테스트")
   void whenInvalidPortValue_thenShouldNotProcess(InvalidPortTestCase testCase) {
     // when
-    try {
-      ForwardedPortContext.setAttribute(testCase.key, Integer.parseInt(testCase.port));
-    } catch (NumberFormatException ignored) {
-      // 예외 발생 예상됨
-    }
+    boolean isValid = validator.isValidForwardedPort(testCase.key, testCase.port);
 
     // then
+    assertThat(isValid).isFalse();
     assertThat(ForwardedPortContext.getAttribute(testCase.key))
       .as("%s '%s'가 처리되지 않아야 함", testCase.description, testCase.port)
       .isEmpty();
@@ -69,9 +73,10 @@ class ForwardedPortContextExceptionTest {
   @DisplayName("범위를 벗어난 포트값 테스트")
   void whenPortValueOutOfRange_thenShouldNotProcess(OutOfRangePortTestCase testCase) {
     // when
-    ForwardedPortContext.setAttribute(testCase.key, testCase.port);
+    boolean isValid = validator.isValidForwardedPort(testCase.key, String.valueOf(testCase.port));
 
     // then
+    assertThat(isValid).isFalse();
     assertThat(ForwardedPortContext.getAttribute(testCase.key))
       .as("%s %d가 처리되지 않아야 함", testCase.description, testCase.port)
       .isEmpty();
@@ -82,13 +87,10 @@ class ForwardedPortContextExceptionTest {
   @DisplayName("유효하지 않은 키 테스트")
   void whenInvalidKey_thenShouldNotProcess(InvalidKeyTestCase testCase) {
     // when
-    try {
-      ForwardedPortContext.setAttribute(testCase.key, testCase.port);
-    } catch (Exception ignored) {
-      // null 키의 경우 예외 발생 가능
-    }
+    boolean isValid = validator.isValidForwardedPort(testCase.key, String.valueOf(testCase.port));
 
     // then
+    assertThat(isValid).isFalse();
     assertThat(ForwardedPortContext.getAttribute(testCase.key))
       .as("%s가 처리되지 않아야 함", testCase.description)
       .isEmpty();

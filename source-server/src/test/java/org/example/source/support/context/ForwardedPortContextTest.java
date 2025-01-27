@@ -17,61 +17,6 @@ class ForwardedPortContextTest {
     ForwardedPortContext.clear();
   }
 
-  private static Stream<TestCase> portTestCases() {
-    return Stream.of(
-      new TestCase("x-forwarded-port", 8080, true),
-      new TestCase("proxy-forwarded-port", 8081, true)
-    );
-  }
-
-  private static Stream<ThreadTestCase> threadTestCases() {
-    return Stream.of(
-      new ThreadTestCase("x-forwarded-port", 8080, 9090),
-      new ThreadTestCase("proxy-forwarded-port", 8081, 9091)
-    );
-  }
-
-  private static Stream<ContextTestCase> contextTestCases() {
-    return Stream.of(
-      new ContextTestCase("x-forwarded-port", 8080),
-      new ContextTestCase("proxy-forwarded-port", 8081)
-    );
-  }
-
-  private static class TestCase {
-    String key;
-    int port;
-    boolean shouldStore;
-
-    TestCase(String key, int port, boolean shouldStore) {
-      this.key = key;
-      this.port = port;
-      this.shouldStore = shouldStore;
-    }
-  }
-
-  private static class ThreadTestCase {
-    String key;
-    int mainPort;
-    int threadPort;
-
-    ThreadTestCase(String key, int mainPort, int threadPort) {
-      this.key = key;
-      this.mainPort = mainPort;
-      this.threadPort = threadPort;
-    }
-  }
-
-  private static class ContextTestCase {
-    String key;
-    int port;
-
-    ContextTestCase(String key, int port) {
-      this.key = key;
-      this.port = port;
-    }
-  }
-
   @ParameterizedTest
   @MethodSource("portTestCases")
   void 포트_키_저장_테스트(TestCase testCase) {
@@ -145,5 +90,60 @@ class ForwardedPortContextTest {
     // then
     ForwardedPortContext.getAttribute(testCase.key)
       .ifPresent(port -> assertThat(port).isEqualTo(testCase.port));
+  }
+
+  private static Stream<TestCase> portTestCases() {
+    return Stream.of(
+      new TestCase("x-forwarded-port", 8080, true),
+      new TestCase("proxy-forwarded-port", 8081, true)
+    );
+  }
+
+  private static Stream<ThreadTestCase> threadTestCases() {
+    return Stream.of(
+      new ThreadTestCase("x-forwarded-port", 8080, 9090),
+      new ThreadTestCase("proxy-forwarded-port", 8081, 9091)
+    );
+  }
+
+  private static Stream<ContextTestCase> contextTestCases() {
+    return Stream.of(
+      new ContextTestCase("x-forwarded-port", 8080),
+      new ContextTestCase("proxy-forwarded-port", 8081)
+    );
+  }
+
+  private static class TestCase {
+    String key;
+    int port;
+    boolean shouldStore;
+
+    TestCase(String key, int port, boolean shouldStore) {
+      this.key = key;
+      this.port = port;
+      this.shouldStore = shouldStore;
+    }
+  }
+
+  private static class ThreadTestCase {
+    String key;
+    int mainPort;
+    int threadPort;
+
+    ThreadTestCase(String key, int mainPort, int threadPort) {
+      this.key = key;
+      this.mainPort = mainPort;
+      this.threadPort = threadPort;
+    }
+  }
+
+  private static class ContextTestCase {
+    String key;
+    int port;
+
+    ContextTestCase(String key, int port) {
+      this.key = key;
+      this.port = port;
+    }
   }
 }
